@@ -46,18 +46,4 @@ class GenreServiceTest{
         assertThat(exception.getMessage()).isEqualTo("Cannot find genre with id: " + id);
     }
 
-    @Test
-    void shouldThrowExceptionWhenCannotFindGenreById1(){
-        //given
-        Long id = 1L;
-        when(genreRepository.findById(id)).thenReturn(Optional.empty());
-
-        //when
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> genreService.createGenre(null));
-
-        //then
-        assertThat(exception.getMessage()).isEqualTo("Cannot find genre with id: " + id);
-    }
-
 }
