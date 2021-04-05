@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+        <syslogHost>localhost</syslogHost>
+        <facility>LOCAL0</facility>
+        <port>514</port>
+        <suffixPattern>tsm-service ${FILE_LOG_PATTERN}</suffixPattern>
+        <stackTracePattern>tsm-service</stackTracePattern>
+    </appender>
+
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.hibernate" level="INFO"/>
+    <logger name="com.zutode" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="SYSLOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <springProfile name="default, dev">
+        <!-- Logging levels: ERROR, WARN, INFO, DEBUG, TRACE -->
+        <logger name="com.zutode" level="INFO"/>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.springframework.orm" level="DEBUG"/>
+        <logger name="org.springframework.orm.hibernate" level="WARN"/>
+        <logger name="org.springframework.orm.jpa" level="WARN"/>
+        <logger name="org.hibernate" level="INFO"/>
+        <logger name="org.hibernate.sql" level="DEBUG"/>
+        <logger name="org.hibernate.type" level="WARN"/>
+        <logger name="org.hibernate.cache" level="WARN"/>
+    </springProfile>
+
+</configuration>
