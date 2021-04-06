@@ -1,49 +1,54 @@
 package com.zutode.bookshopclone.shop.domain.service;
 
-
+import com.zutode.bookshopclone.shop.application.dto.GenreDto;
+import com.zutode.bookshopclone.shop.application.exception.ResourceAlreadyExistsException;
+import com.zutode.bookshopclone.shop.domain.model.entity.Genre;
 import com.zutode.bookshopclone.shop.domain.repository.GenreRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
-import org.testng.annotations.Test;
-
-import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
+public class GenreServiceTest {
 
-class GenreServiceTest{
 
-    @Mock
-    private ModelMapper modelMapper;
     @Mock
     private GenreRepository genreRepository;
     @InjectMocks
     private GenreService genreService;
 
+
     @BeforeEach
-    void init(){
-        MockitoAnnotations.openMocks(this);
+    public void init() {
+        MockitoAnnotations.initMocks(this);
     }
+
 
     @Test
-    void shouldThrowExceptionWhenCannotFindGenreById(){
+    void shouldThrowExceptionWhenGenreAlreadyExists() {
         //given
-        Long id = 1L;
-        when(genreRepository.findById(id)).thenReturn(Optional.empty());
+        GenreDto genreDto = new GenreDto();
+        String name = "name";
+        genreDto.setName(name);
+        when(genreRepository.existsByName(name)).thenReturn(true);
 
         //when
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> genreService.createGenre(null));
+        ResourceAlreadyExistsException exception = assertThrows(ResourceAlreadyExistsException.class,
+                () -> genreService.createGenre(genreDto));
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("Cannot find genre with id: " + id);
+        assertThat(exception.getMessage()).isEqualTo("Genre: " + name + " already exists");
     }
+
+
 
 }
