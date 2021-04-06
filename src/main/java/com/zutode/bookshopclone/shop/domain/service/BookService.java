@@ -35,8 +35,7 @@ public class BookService {
     public BookReadDto updateBook(BookWriteDto bookWriteDto, Long id) {
         Book book = findBookById(id);
         settingDtoValuesToEntity(bookWriteDto,book);
-        Book saved = bookRepository.save(book);
-        return mapEntityToDto(saved);
+        return mapEntityToDto(book);
     }
 
     @Transactional

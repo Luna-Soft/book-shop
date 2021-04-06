@@ -6,6 +6,7 @@ import com.zutode.bookshopclone.shop.application.exception.ResourceNotFoundExcep
 import com.zutode.bookshopclone.shop.domain.model.entity.Author;
 import com.zutode.bookshopclone.shop.domain.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +22,30 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthorService {
 
+    private final ModelMapper modelMapper;
     private final AuthorRepository authorRepository;
 
 
     @Transactional
+    public AuthorDto createAuthor(AuthorDto authorDto) {
+        checkIfAuthorAlreadyExists(authorDto);
+        Author author = modelMapper.map(authorDto, Author.class);
+        Author saved = authorRepository.save(author);
+        return modelMapper.map(saved, AuthorDto.class);
+    }
+
+    @Transactional
+    public AuthorDto updateAuthor(AuthorDto authorDto, Long id) {
+        Author author = findAuthorById(id);
+        author.setName(authorDto.getName());
+        author.setSurname(authorDto.getSurname());
+        return modelMapper.map(author, AuthorDto.class);
+    }
+
+    @Transactional
     public AuthorDto getAuthor(Long id) {
         Author author = findAuthorById(id);
-        return mappedEntityToDto(author);
+        return modelMapper.map(author, AuthorDto.class);
     }
 
     @Transactional
@@ -35,7 +53,7 @@ public class AuthorService {
         PageRequest pageRequest = PageRequest.of(page, size);
         return authorRepository.findAll(pageRequest)
                 .stream()
-                .map(author -> mappedEntityToDto(author))
+                .map(author -> modelMapper.map(author, AuthorDto.class))
                 .collect(Collectors.toList());
     }
 
@@ -49,21 +67,6 @@ public class AuthorService {
         return authors;
     }
 
-    @Transactional
-    public AuthorDto createAuthor(AuthorDto authorDto) {
-        checkIfAuthorAlreadyExists(authorDto);
-        Author author = mappedDtoToEntity(authorDto);
-        Author saved = authorRepository.save(author);
-        return mappedEntityToDto(saved);
-    }
-
-    @Transactional
-    public AuthorDto updateAuthor(AuthorDto authorDto, Long id) {
-        Author author = findAuthorById(id);
-        settingDtoValuesToEntity(authorDto, author);
-        Author saved = authorRepository.save(author);
-        return mappedEntityToDto(saved);
-    }
 
     @Transactional
     public void deleteAuthor(Long id) {
@@ -72,28 +75,6 @@ public class AuthorService {
     }
 
 
-    private AuthorDto mappedEntityToDto(Author saved) {
-        AuthorDto returned = new AuthorDto();
-        settingEntityValuesToDto(saved, returned);
-        return returned;
-    }
-
-    private void settingEntityValuesToDto(Author saved, AuthorDto returned) {
-        returned.setId(saved.getId());
-        returned.setName(saved.getName());
-        returned.setSurname(saved.getSurname());
-    }
-
-    private Author mappedDtoToEntity(AuthorDto authorDto) {
-        Author author = new Author();
-        settingDtoValuesToEntity(authorDto, author);
-        return author;
-    }
-
-    private void settingDtoValuesToEntity(AuthorDto authorDto, Author author) {
-        author.setName(authorDto.getName());
-        author.setSurname(authorDto.getSurname());
-    }
 
     private Author findAuthorById(Long id) {
         return authorRepository.findById(id)
