@@ -34,8 +34,7 @@ public class PublishingHouseService {
     public PublishingHouseDto updatePublishingHouse(PublishingHouseDto publishingHouseDto, Long id) {
         PublishingHouse publishingHouse = findPublishingHouseById(id);
         publishingHouse.setName(publishingHouseDto.getName());
-        PublishingHouse saved = publishingHouseRepository.save(publishingHouse);
-        return modelMapper.map(saved,PublishingHouseDto.class);
+        return modelMapper.map(publishingHouse,PublishingHouseDto.class);
     }
 
     @Transactional

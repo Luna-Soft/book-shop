@@ -39,8 +39,7 @@ public class AuthorService {
         Author author = findAuthorById(id);
         author.setName(authorDto.getName());
         author.setSurname(authorDto.getSurname());
-        Author saved = authorRepository.save(author);
-        return modelMapper.map(saved, AuthorDto.class);
+        return modelMapper.map(author, AuthorDto.class);
     }
 
     @Transactional

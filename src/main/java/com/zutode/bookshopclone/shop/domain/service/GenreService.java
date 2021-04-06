@@ -39,8 +39,7 @@ public class GenreService {
     public GenreDto updateGenre(GenreDto genreDto, long id) {
         Genre genre = findGenreById(id);
         genre.setName(genreDto.getName());
-        Genre saved = genreRepository.save(genre);
-        return modelMapper.map(saved, GenreDto.class);
+        return modelMapper.map(genre, GenreDto.class);
     }
 
 
