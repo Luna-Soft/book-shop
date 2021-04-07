@@ -216,11 +216,9 @@ public class GenreServiceTest {
     @Test
     void shouldThrowExceptionWhenCannotFindGenresWithId() {
         //given
-        Genre genre1 = new Genre();
+        Genre genre = new Genre();
         Long id = 132L;
-        genre1.setId(id);
-        Set<Genre> genres = Set.of(genre1);
-
+        Set<Genre> genres = Set.of(genre);
         Set<Long> ids = new HashSet<>();
         ids.add(854L);
         ids.add(132L);
