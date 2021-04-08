@@ -4,7 +4,6 @@ import com.zutode.bookshopclone.shop.application.dto.AuthorDto;
 import com.zutode.bookshopclone.shop.application.exception.ResourceAlreadyExistsException;
 import com.zutode.bookshopclone.shop.application.exception.ResourceNotFoundException;
 import com.zutode.bookshopclone.shop.domain.model.entity.Author;
-import com.zutode.bookshopclone.shop.domain.model.entity.Genre;
 import com.zutode.bookshopclone.shop.domain.repository.AuthorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +19,10 @@ import org.springframework.data.domain.PageRequest;
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class AuthorServiceTest {
@@ -37,14 +36,13 @@ public class AuthorServiceTest {
 
 
     @BeforeEach
-    public void init(){
+    public void init() {
         MockitoAnnotations.initMocks(this);
     }
 
 
-
     @Test
-    void shouldThrowExceptionWhenAuthorAlreadyExists(){
+    void shouldThrowExceptionWhenAuthorAlreadyExists() {
         //given
         AuthorDto authorDto = new AuthorDto();
         String name = "name";
@@ -63,7 +61,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldSaveCreatedAuthor(){
+    void shouldSaveCreatedAuthor() {
         //given
         Author author = new Author();
         AuthorDto authorDto = new AuthorDto();
@@ -77,14 +75,13 @@ public class AuthorServiceTest {
         //when
         AuthorDto returned = authorService.createAuthor(authorDto);
 
-
         //then
         assertThat(authorDto).isEqualTo(returned);
     }
 
 
     @Test
-    void shouldThrowExceptionWhenCannotFindAuthorByIdInMethodGetAuthor(){
+    void shouldThrowExceptionWhenCannotFindAuthorByIdInGetAuthorMethod() {
         //given
         Long id = 123L;
         when(authorRepository.findById(id)).thenReturn(Optional.empty());
@@ -99,7 +96,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldGetAuthor(){
+    void shouldGetAuthor() {
         //given
         Author author = new Author();
         AuthorDto authorDto = new AuthorDto();
@@ -116,7 +113,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldThrowExceptionWhenCannotFindAuthorByIdInMethodUpdateAuthor(){
+    void shouldThrowExceptionWhenCannotFindAuthorByIdInUpdateAuthorMethod() {
         //given
         AuthorDto authorDto = new AuthorDto();
         Long id = 123L;
@@ -132,7 +129,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldSaveUpdatedAuthor(){
+    void shouldSaveUpdatedAuthor() {
         //given
         Author author = Mockito.spy(Author.class);
         AuthorDto authorDto = Mockito.spy(AuthorDto.class);
@@ -151,7 +148,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldThrowExceptionWhenCannotFindAuthorByIdInMethodDeleteAuthor(){
+    void shouldThrowExceptionWhenCannotFindAuthorByIdInDeleteAuthorMethod() {
         //given
         Long id = 123L;
         when(authorRepository.findById(id)).thenReturn(Optional.empty());
@@ -166,7 +163,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldDeleteAuthor(){
+    void shouldDeleteAuthor() {
         //given
         Author author = new Author();
         Long id = 123L;
@@ -181,7 +178,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldFindAllAuthorsByIds(){
+    void shouldFindAllAuthorsByIds() {
         //given
         Author author1 = new Author();
         Author author2 = new Author();
@@ -198,7 +195,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldGetPageableAuthors(){
+    void shouldGetPageableAuthors() {
         //given
         Author author = new Author();
         AuthorDto authorDto = new AuthorDto();
@@ -221,7 +218,7 @@ public class AuthorServiceTest {
 
 
     @Test
-    void shouldGetAuthorsByIds(){
+    void shouldGetAuthorsByIds() {
         //given
         Author author = new Author();
         Long id = 123L;
@@ -238,14 +235,6 @@ public class AuthorServiceTest {
         //then
         assertThat(exception.getMessage()).isEqualTo("Cannot find authors with id " + Arrays.toString(ids.toArray()));
     }
-
-
-
-
-
-
-
-
 
 
 }

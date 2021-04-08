@@ -78,7 +78,7 @@ public class GenreServiceTest {
 
 
     @Test
-    void shouldThrowExceptionWhenCannotFindGenreByIdInMethodGetGenre() {
+    void shouldThrowExceptionWhenCannotFindGenreByIdInGetGenreMethod() {
         //given
         Long id = 123L;
         when(genreRepository.findById(id)).thenReturn(Optional.empty());
@@ -110,7 +110,7 @@ public class GenreServiceTest {
 
 
     @Test
-    void shouldThrowExceptionWhenCannotFindGenreByIdInMethodUpdateGenre() {
+    void shouldThrowExceptionWhenCannotFindGenreByIdInUpdateGenreMethod() {
         //given
         GenreDto genreDto = new GenreDto();
         Long id = 123L;
@@ -145,7 +145,7 @@ public class GenreServiceTest {
 
 
     @Test
-    void shouldThrowExceptionWhenCannotFindGenreByIdInMethodDeleteGenre() {
+    void shouldThrowExceptionWhenCannotFindGenreByIdInDeleteGenreMethod() {
         //given
         Long id = 123L;
         when(genreRepository.findById(id)).thenReturn(Optional.empty());
