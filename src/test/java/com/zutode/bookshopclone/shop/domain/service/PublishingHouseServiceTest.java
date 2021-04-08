@@ -131,7 +131,7 @@ public class PublishingHouseServiceTest {
     @Test
     void shouldGetPublishingHouse() {
         //given
-        PublishingHouse publishingHouse = Mockito.spy(PublishingHouse.class);
+        PublishingHouse publishingHouse = new PublishingHouse();
         Long id = 132L;
         PublishingHouseDto publishingHouseDto = new PublishingHouseDto();
         when(publishingHouseRepository.findById(id)).thenReturn(Optional.of(publishingHouse));
