@@ -68,7 +68,7 @@ public class PublishingHouseService {
 
 
     private void checkIfPublishingHouseAlreadyExists(PublishingHouseDto publishingHouseDto) {
-        if (publishingHouseRepository.existsByName(publishingHouseDto.getName())) {
+        if(publishingHouseRepository.existsByName(publishingHouseDto.getName())) {
             throw new ResourceAlreadyExistsException("Publishing house by name: " + publishingHouseDto.getName() + " already exists");
         }
     }
