@@ -101,8 +101,10 @@ public class BookRentalServiceTest {
         LocalDate initialDate = LocalDate.of(2021, 4, 9);
         Book book = new Book();
         UserAccount userAccount = new UserAccount();
+
         bookRentalWriteDto.setBookId(bookId);
         bookRentalWriteDto.setUserId(userId);
+        book.setId(bookId);
 
         when(modelMapper.map(bookRentalWriteDto, BookRental.class)).thenReturn(bookRental);
         when(bookService.findBookById(bookId)).thenReturn(book);

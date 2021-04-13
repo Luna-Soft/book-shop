@@ -89,26 +89,26 @@ public class BookRentalService {
     @Transactional
     public BookRentalReadDto extendRentedBook(Long bookId) {
         BookRental bookRental = bookRentalRepository.findByBookId(bookId);
-        checkIfBookIsAfterTheExpectedReturnDate(bookId, bookRental);
-        checkIfBookHasAlreadyBeenExtendedTwice(bookRental);
-        updateInformationAboutExtension(bookRental);
+        checkIfBookReturnDateIsNotExceeded(bookId, bookRental);
+        checkIfBookRentalExtensionIsNotOverLimit(bookRental);
+        increaseExtensionCounterAndPostponeReturnDate(bookRental);
         return modelMapper.map(bookRental, BookRentalReadDto.class);
     }
 
 
-    private void checkIfBookIsAfterTheExpectedReturnDate(Long bookId, BookRental bookRental) {
+    private void checkIfBookReturnDateIsNotExceeded(Long bookId, BookRental bookRental) {
         if (bookRental.getExpectedReturnDate().isBefore(timeProvider.now())) {
             throw new IllegalStateException("Book with id " + bookId + " is after the expected return date, you cannot extend this rental!");
         }
     }
 
-    private void checkIfBookHasAlreadyBeenExtendedTwice(BookRental bookRental) {
+    private void checkIfBookRentalExtensionIsNotOverLimit(BookRental bookRental) {
         if (bookRental.getExtension() >= 2) {
             throw new IllegalStateException("You have just extended book twice!");
         }
     }
 
-    private void updateInformationAboutExtension(BookRental bookRental) {
+    private void increaseExtensionCounterAndPostponeReturnDate(BookRental bookRental) {
         bookRental.setExpectedReturnDate(bookRental.getExpectedReturnDate().plusDays(rentalDuration));
         bookRental.setExtension(bookRental.getExtension() + 1);
     }
