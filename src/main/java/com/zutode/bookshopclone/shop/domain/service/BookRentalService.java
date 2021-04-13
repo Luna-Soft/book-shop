@@ -6,11 +6,9 @@ import com.zutode.bookshopclone.shop.application.dto.BookReadDto;
 import com.zutode.bookshopclone.shop.application.dto.BookRentalReadDto;
 import com.zutode.bookshopclone.shop.application.dto.BookRentalWriteDto;
 import com.zutode.bookshopclone.shop.application.exception.ResourceAlreadyExistsException;
-import com.zutode.bookshopclone.shop.application.exception.ResourceNotFoundException;
 import com.zutode.bookshopclone.shop.domain.model.TimeProvider;
 import com.zutode.bookshopclone.shop.domain.model.entity.Book;
 import com.zutode.bookshopclone.shop.domain.model.entity.BookRental;
-import com.zutode.bookshopclone.shop.domain.model.entity.Genre;
 import com.zutode.bookshopclone.shop.domain.repository.BookRentalRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +26,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 
 @Service
+
 public class BookRentalService {
 
     private final BookRentalRepository bookRentalRepository;
@@ -57,54 +56,84 @@ public class BookRentalService {
 
     @Transactional
     public BookRentalReadDto createBooksRental(BookRentalWriteDto bookRentalWriteDto) {
-        if (bookRentalRepository.existsByBookIdAndReturnDateIsNull(bookRentalWriteDto.getBookId())) {
-            throw new ResourceAlreadyExistsException("Book with id " + bookRentalWriteDto.getBookId() + " is already rent!");
-        }
-        BookRental bookRental = new BookRental();
-        Book book = bookService.findBookById(bookRentalWriteDto.getBookId());
-        bookRental.setBook(book);
-
-        UserAccount user = userService.findUserById(bookRentalWriteDto.getUserId());
-        bookRental.setUser(user);
-        LocalDate initialDate = timeProvider.now();
-        bookRental.setInitialDate(initialDate);
-        bookRental.setExpectedReturnDate(initialDate.plusDays(rentalDuration));
-
-
+        BookRental bookRental = fetchAndAssignUserAndBook(bookRentalWriteDto);
+        setRentalDates(bookRental);
+        checkIfBookIsAlreadyRent(bookRental);
         BookRental saved = bookRentalRepository.save(bookRental);
         return modelMapper.map(saved, BookRentalReadDto.class);
     }
+    
+    private BookRental fetchAndAssignUserAndBook(BookRentalWriteDto bookRentalWriteDto) {
+        BookRental bookRental = modelMapper.map(bookRentalWriteDto, BookRental.class);
+        Book book = bookService.findBookById(bookRentalWriteDto.getBookId());
+        UserAccount user = userService.findUserById(bookRentalWriteDto.getUserId());
+        bookRental.setBook(book);
+        bookRental.setUser(user);
+        return bookRental;
+    }
+
+    private void setRentalDates(BookRental bookRental) {
+        LocalDate initialDate = timeProvider.now();
+        bookRental.setInitialDate(initialDate);
+        bookRental.setExpectedReturnDate(initialDate.plusDays(rentalDuration));
+    }
+
+    private void checkIfBookIsAlreadyRent(BookRental bookRental) {
+        if (bookRentalRepository.existsByBookIdAndReturnDateIsNull(bookRental.getBook().getId())) {
+            throw new ResourceAlreadyExistsException("Book with id " + bookRental.getBook().getId() + " is already rent!");
+        }
+    }
+
+
+
+    @Transactional
+    public BookRentalReadDto extendRentedBook(Long bookId) {
+        BookRental bookRental = bookRentalRepository.findByBookId(bookId);
+        checkIfBookIsAfterTheExpectedReturnDate(bookId, bookRental);
+        checkIfBookHasAlreadyBeenExtendedTwice(bookRental);
+        updateInformationAboutExtension(bookRental);
+        return modelMapper.map(bookRental, BookRentalReadDto.class);
+    }
+
+
+    private void checkIfBookIsAfterTheExpectedReturnDate(Long bookId, BookRental bookRental) {
+        if (bookRental.getExpectedReturnDate().isBefore(timeProvider.now())) {
+            throw new IllegalStateException("Book with id " + bookId + " is after the expected return date, you cannot extend this rental!");
+        }
+    }
+
+    private void checkIfBookHasAlreadyBeenExtendedTwice(BookRental bookRental) {
+        if (bookRental.getExtension() >= 2) {
+            throw new IllegalStateException("You have just extended book twice!");
+        }
+    }
+
+    private void updateInformationAboutExtension(BookRental bookRental) {
+        bookRental.setExpectedReturnDate(bookRental.getExpectedReturnDate().plusDays(rentalDuration));
+        bookRental.setExtension(bookRental.getExtension() + 1);
+    }
+
 
 
     @Transactional
     public BookRentalReadDto returnRentedBook(Long bookId) {
         BookRental bookRental = bookRentalRepository.findByBookId(bookId);
         bookRental.setReturnDate(timeProvider.now());
+        checkIfIsCharge(bookRental);
+        return modelMapper.map(bookRental, BookRentalReadDto.class);
+    }
+
+
+    private void checkIfIsCharge(BookRental bookRental) {
         if (bookRental.getReturnDate().isAfter(bookRental.getExpectedReturnDate())) {
             long daysLate = DAYS.between(bookRental.getExpectedReturnDate(), bookRental.getReturnDate());
             BigDecimal bigDecimal = BigDecimal.valueOf(daysLate);
             bookRental.setCharge(chargePerDay.multiply(bigDecimal));
         }
-        return modelMapper.map(bookRental, BookRentalReadDto.class);
     }
 
 
-    @Transactional
-    public BookRentalReadDto extendRentedBook(Long bookId) {
-        BookRental bookRental = bookRentalRepository.findByBookId(bookId);
-        if (bookRental.getExpectedReturnDate().isBefore(timeProvider.now())) {
-            long daysLate = DAYS.between(bookRental.getExpectedReturnDate(), timeProvider.now());
-            BigDecimal bigDecimal = BigDecimal.valueOf(daysLate);
-            bookRental.setCharge(chargePerDay.multiply(bigDecimal));
-            throw new IllegalStateException("Book with id " + bookId + " has a charge, you cannot extend its!");
-        }
-        if (bookRental.getExtension() >= 2) {
-            throw new IllegalStateException("You have just extended book twice!");
-        }
-        bookRental.setExpectedReturnDate(bookRental.getExpectedReturnDate().plusDays(rentalDuration));
-        bookRental.setExtension(bookRental.getExtension() + 1);
-        return modelMapper.map(bookRental, BookRentalReadDto.class);
-    }
+
 
     @Transactional
     public BookRentalReadDto getBookRental(Long id) {
@@ -112,6 +141,7 @@ public class BookRentalService {
                 .orElseThrow(() -> new EntityNotFoundException("Book rental with id " + id + " does not exist"));
         return modelMapper.map(bookRental, BookRentalReadDto.class);
     }
+
 
     @Transactional
     public List<BookRentalReadDto> getPageableBooksRental(int page, int size) {
@@ -134,7 +164,6 @@ public class BookRentalService {
             throw new EntityNotFoundException("Book rental does not exist");
         }
     }
-
 
 
 
