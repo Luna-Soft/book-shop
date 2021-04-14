@@ -34,4 +34,9 @@ public class BookRental extends BaseEntity {
     private BigDecimal charge;
     private int extension;
 
+ /*
+
+    @Embedded
+    private ReturnModel returnModel;
+*/
 }
