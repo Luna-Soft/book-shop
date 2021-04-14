@@ -13,6 +13,8 @@ import com.zutode.bookshopclone.shop.domain.repository.BookRentalRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,7 +116,6 @@ public class BookRentalService {
     }
 
 
-
     @Transactional
     public BookRentalReadDto returnRentedBook(Long bookId) {
         BookRental bookRental = bookRentalRepository.findByBookId(bookId);
@@ -131,8 +132,6 @@ public class BookRentalService {
             bookRental.setCharge(chargePerDay.multiply(bigDecimal));
         }
     }
-
-
 
 
     @Transactional
@@ -160,11 +159,10 @@ public class BookRentalService {
             bookRentalRepository.delete(bookRental);
             BookReadDto book = bookService.getBook(bookId);
             System.out.println("You have to pay punishment: " + book.getPrice());
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new EntityNotFoundException("Book rental does not exist");
         }
     }
-
 
 
 }

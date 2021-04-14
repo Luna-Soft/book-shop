@@ -8,6 +8,7 @@ import com.zutode.bookshopclone.shop.domain.service.BookService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -49,28 +50,28 @@ public class BookRentalController {
     }
 
     @PutMapping("/booksRental/{bookId}/extend")
-    public BookRentalReadDto extendRentedBook(@PathVariable("bookId") Long bookId){
+    public BookRentalReadDto extendRentedBook(@PathVariable("bookId") Long bookId) {
         return bookRentalService.extendRentedBook(bookId);
     }
 
     @GetMapping("/booksRental/{id}")
-    public BookRentalReadDto getBookRental(@PathVariable("id") Long id){
+    public BookRentalReadDto getBookRental(@PathVariable("id") Long id) {
         return bookRentalService.getBookRental(id);
     }
 
     @GetMapping("/booksRentals")
     public List<BookRentalReadDto> getPageableBooksRentals(@RequestParam(name = "page", defaultValue = "0") int page,
-                                                           @RequestParam(name = "size", defaultValue = "5") int size){
+                                                           @RequestParam(name = "size", defaultValue = "5") int size,
+                                                           Authentication authentication) {
         return bookRentalService.getPageableBooksRental(page, size);
     }
 
 
     @DeleteMapping("/booksRental/{bookId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBookRental(@PathVariable("bookId") Long bookId){
+    public void deleteBookRental(@PathVariable("bookId") Long bookId) {
         bookRentalService.deleteBookRental(bookId);
     }
-
 
 
 }
