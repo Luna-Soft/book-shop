@@ -28,8 +28,8 @@ public class AuthorService {
 
     @Transactional
     public AuthorDto createAuthor(AuthorDto authorDto) {
-        checkIfAuthorAlreadyExists(authorDto);
         Author author = modelMapper.map(authorDto, Author.class);
+        checkIfAuthorAlreadyExists(author);
         Author saved = authorRepository.save(author);
         return modelMapper.map(saved, AuthorDto.class);
     }
@@ -81,9 +81,9 @@ public class AuthorService {
                 .orElseThrow(() -> new EntityNotFoundException("Author by id: " + id + " does not exist"));
     }
 
-    private void checkIfAuthorAlreadyExists(AuthorDto authorDto) {
-        if (authorRepository.existsByNameAndSurname(authorDto.getName(), authorDto.getSurname())) {
-            throw new ResourceAlreadyExistsException("Author: " + authorDto.getName() + " " + authorDto.getSurname() + " already exists");
+    private void checkIfAuthorAlreadyExists(Author author) {
+        if (authorRepository.existsByNameAndSurname(author.getName(), author.getSurname())) {
+            throw new ResourceAlreadyExistsException("Author: " + author.getName() + " " + author.getSurname() + " already exists");
         }
     }
 

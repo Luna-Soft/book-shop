@@ -1,6 +1,7 @@
 package com.zutode.bookshopclone.auth.domain.util;
 
 import com.zutode.bookshopclone.auth.domain.model.entity.UserAccount;
+import com.zutode.bookshopclone.auth.domain.model.entity.UserRoles;
 import com.zutode.bookshopclone.auth.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,10 +21,10 @@ public class TestUserUtils {
     public void addTestUsers() {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         List<UserAccount> userAccounts = Stream.of(
-                new UserAccount(101L, "zutode", bCryptPasswordEncoder.encode("password"), "zutode@wp.pl"),
-                new UserAccount(102L, "user1", bCryptPasswordEncoder.encode("pwd1"), "user1@wp.pl"),
-                new UserAccount(103L, "user2", bCryptPasswordEncoder.encode("pwd2"), "user2@wp.pl"),
-                new UserAccount(104L, "user3", bCryptPasswordEncoder.encode("pwd3"), "user3@wp.pl")
+                new UserAccount(101L, "zutode", bCryptPasswordEncoder.encode("password"), "zutode@wp.pl", UserRoles.ROLE_MAINTAINER),
+                new UserAccount(102L, "user1", bCryptPasswordEncoder.encode("pwd1"), "user1@wp.pl", UserRoles.ROLE_READER),
+                new UserAccount(103L, "user2", bCryptPasswordEncoder.encode("pwd2"), "user2@wp.pl", UserRoles.ROLE_READER),
+                new UserAccount(104L, "user3", bCryptPasswordEncoder.encode("pwd3"), "user3@wp.pl", UserRoles.ROLE_READER)
         ).collect(Collectors.toList());
 
         userRepository.saveAll(userAccounts);

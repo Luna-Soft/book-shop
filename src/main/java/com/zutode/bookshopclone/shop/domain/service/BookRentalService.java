@@ -28,51 +28,39 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 
 @Service
-
 public class BookRentalService {
 
     private final BookRentalRepository bookRentalRepository;
-    private final BookService bookService;
-    private final UserService userService;
     private final ModelMapper modelMapper;
     private final int rentalDuration;
     private final BigDecimal chargePerDay;
     private final TimeProvider timeProvider;
+    private final BookService bookService;
 
     public BookRentalService(BookRentalRepository bookRentalRepository,
-                             BookService bookService,
-                             UserService userService,
                              ModelMapper modelMapper,
                              @Value("${bookshop.lending.duration}") int rentalDuration,
                              @Value("${bookshop.lending.charge}") BigDecimal chargePerDay,
-                             TimeProvider timeProvider) {
+                             TimeProvider timeProvider,
+                             BookService bookService) {
         this.bookRentalRepository = bookRentalRepository;
-        this.bookService = bookService;
-        this.userService = userService;
         this.modelMapper = modelMapper;
         this.rentalDuration = rentalDuration;
         this.chargePerDay = chargePerDay;
         this.timeProvider = timeProvider;
+        this.bookService = bookService;
     }
 
 
     @Transactional
     public BookRentalReadDto createBooksRental(BookRentalWriteDto bookRentalWriteDto) {
-        BookRental bookRental = fetchAndAssignUserAndBook(bookRentalWriteDto);
+        BookRental bookRental = modelMapper.map(bookRentalWriteDto, BookRental.class);
         setRentalDates(bookRental);
         checkIfBookIsAlreadyRent(bookRental);
         BookRental saved = bookRentalRepository.save(bookRental);
         return modelMapper.map(saved, BookRentalReadDto.class);
     }
-    
-    private BookRental fetchAndAssignUserAndBook(BookRentalWriteDto bookRentalWriteDto) {
-        BookRental bookRental = modelMapper.map(bookRentalWriteDto, BookRental.class);
-        Book book = bookService.findBookById(bookRentalWriteDto.getBookId());
-        UserAccount user = userService.findUserById(bookRentalWriteDto.getUserId());
-        bookRental.setBook(book);
-        bookRental.setUser(user);
-        return bookRental;
-    }
+
 
     private void setRentalDates(BookRental bookRental) {
         LocalDate initialDate = timeProvider.now();
@@ -143,9 +131,10 @@ public class BookRentalService {
 
 
     @Transactional
-    public List<BookRentalReadDto> getPageableBooksRental(int page, int size) {
+    public List<BookRentalReadDto> getPageableBooksRental(int page, int size, Authentication authentication) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return bookRentalRepository.findAll(pageRequest)
+        User principal = (User) authentication.getPrincipal();
+        return bookRentalRepository.findBookRentalByUser(principal.getUsername(), pageRequest)
                 .stream()
                 .map(bookRental -> modelMapper.map(bookRental, BookRentalReadDto.class))
                 .collect(Collectors.toList());

@@ -6,6 +6,7 @@ import com.zutode.bookshopclone.shop.application.validator.RestConstraintValidat
 import com.zutode.bookshopclone.shop.domain.service.BookService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class BookController {
 
 
     @PostMapping("/book")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     @ResponseStatus(code = HttpStatus.CREATED)
     public BookReadDto addBook(@Validated @RequestBody BookWriteDto newBook,
                                BindingResult bindingResult) {
@@ -35,6 +37,7 @@ public class BookController {
     }
 
     @PutMapping("/book/{id}")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     public BookReadDto updateBook(@PathVariable("id") Long id,
                                   @Validated @RequestBody BookWriteDto bookWriteDto,
                                   BindingResult bindingResult) {
@@ -43,12 +46,14 @@ public class BookController {
     }
 
     @GetMapping("/book/{id}")
+    @PreAuthorize("hasRole('ROLE_READER')")
     public BookReadDto getBook(@PathVariable("id") Long id) {
         return bookService.getBook(id);
     }
 
 
     @GetMapping("/books")
+    @PreAuthorize("hasRole('ROLE_READER')")
     public List<BookReadDto> getPageableBooks(@RequestParam(name = "page", defaultValue = "0") int page,
                                               @RequestParam(name = "size", defaultValue = "5") int size) {
         return bookService.getPageableBooks(page, size);
@@ -57,6 +62,7 @@ public class BookController {
 
     @DeleteMapping("/book/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     public void deleteBook(@PathVariable("id") Long id) {
         bookService.deleteBook(id);
     }

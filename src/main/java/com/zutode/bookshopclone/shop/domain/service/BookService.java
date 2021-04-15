@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,11 +21,12 @@ public class BookService {
     private final AuthorService authorService;
     private final GenreService genreService;
     private final PublishingHouseService publishingHouseService;
+    private final BookFinder bookFinder;
 
     @Transactional
     public BookReadDto createBook(BookWriteDto bookWriteDto) {
-        checkIfBookAlreadyExists(bookWriteDto);
         Book book = mapDtoToEntity(bookWriteDto);
+        checkIfBookAlreadyExists(book);
         Book saved = bookRepository.save(book);
         return mapEntityToDto(saved);
     }
@@ -34,7 +34,7 @@ public class BookService {
     @Transactional
     public BookReadDto updateBook(BookWriteDto bookWriteDto, Long id) {
         Book book = findBookById(id);
-        settingDtoValuesToEntity(bookWriteDto,book);
+        settingDtoValuesToEntity(bookWriteDto, book);
         return mapEntityToDto(book);
     }
 
@@ -59,8 +59,6 @@ public class BookService {
         Book book = findBookById(id);
         bookRepository.delete(book);
     }
-
-
 
 
     private BookReadDto mapEntityToDto(Book saved) {
@@ -95,13 +93,12 @@ public class BookService {
 
     @Transactional
     public Book findBookById(Long id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id: " + id + " does not exist"));
+        return bookFinder.findBookById(id);
     }
 
-    private void checkIfBookAlreadyExists(BookWriteDto bookWriteDto) {
-        if (bookRepository.existsByISBN(bookWriteDto.getISBN())) {
-            throw new ResourceAlreadyExistsException("Book in ISBN: " + bookWriteDto.getISBN() + "already exists");
+    private void checkIfBookAlreadyExists(Book book) {
+        if (bookRepository.existsByISBN(book.getISBN())) {
+            throw new ResourceAlreadyExistsException("Book in ISBN: " + book.getISBN() + "already exists");
         }
     }
 }

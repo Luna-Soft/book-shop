@@ -5,6 +5,7 @@ import com.zutode.bookshopclone.shop.application.validator.RestConstraintValidat
 import com.zutode.bookshopclone.shop.domain.service.AuthorService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class AuthorController {
 
 
     @PostMapping("/author")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     @ResponseStatus(code = HttpStatus.CREATED)
     public AuthorDto addAuthor(@Validated @RequestBody AuthorDto newAuthorDto, BindingResult bindingResult) {
         validator.validate(bindingResult);
@@ -33,12 +35,14 @@ public class AuthorController {
     }
 
     @GetMapping("/author/{id}")
+    @PreAuthorize("hasRole('ROLE_READER')")
     public AuthorDto getAuthor(@PathVariable("id") Long id) {
         return authorService.getAuthor(id);
     }
 
 
     @GetMapping("/authors")
+    @PreAuthorize("hasRole('ROLE_READER')")
     public List<AuthorDto> getPageableAuthors(@RequestParam(name = "page", defaultValue = "0") int page,
                                               @RequestParam(name = "size", defaultValue = "5") int size) {
         return authorService.getPageableAuthors(page, size);
@@ -46,6 +50,7 @@ public class AuthorController {
     }
 
     @PutMapping("/author/{id}")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     public AuthorDto updateAuthor(@Validated @RequestBody AuthorDto authorDto,
                                   @PathVariable("id") Long id,
                                   BindingResult bindingResult) {
@@ -54,6 +59,7 @@ public class AuthorController {
     }
 
     @DeleteMapping("/author/{id}")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAuthor(@PathVariable("id") Long id) {
         authorService.deleteAuthor(id);

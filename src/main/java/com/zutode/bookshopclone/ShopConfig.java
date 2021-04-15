@@ -1,5 +1,7 @@
 package com.zutode.bookshopclone;
 
+import com.zutode.bookshopclone.shop.domain.converter.BookIdToBookConverter;
+import com.zutode.bookshopclone.auth.domain.converter.UserIdToUserAccountConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,12 +15,16 @@ import java.util.TimeZone;
 public class ShopConfig {
 
     @Bean
-    public ModelMapper modelMapper(){
-        return new ModelMapper();
+    public ModelMapper modelMapper(UserIdToUserAccountConverter userIdToUserAccountConverter,
+                                   BookIdToBookConverter bookIdToBookConverter) {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(bookIdToBookConverter);
+        modelMapper.addConverter(userIdToUserAccountConverter);
+        return modelMapper;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

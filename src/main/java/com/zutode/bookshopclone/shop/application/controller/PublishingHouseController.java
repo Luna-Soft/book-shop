@@ -5,6 +5,7 @@ import com.zutode.bookshopclone.shop.application.validator.RestConstraintValidat
 import com.zutode.bookshopclone.shop.domain.service.PublishingHouseService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class PublishingHouseController {
 
 
     @PostMapping("/publishingHouse")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     @ResponseStatus(code = HttpStatus.CREATED)
     public PublishingHouseDto addPublishingHouse(@Validated @RequestBody PublishingHouseDto newPublishingHouse,
                                                  BindingResult bindingResult) {
@@ -34,6 +36,7 @@ public class PublishingHouseController {
 
 
     @PutMapping("/publishingHouse/{id}")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     public PublishingHouseDto updatePublishingHouse(@Validated @RequestBody PublishingHouseDto publishingHouseDto,
                                                     @PathVariable("id") Long id,
                                                     BindingResult bindingResult) {
@@ -43,17 +46,20 @@ public class PublishingHouseController {
 
 
     @GetMapping("/publishingHouse/{id}")
+    @PreAuthorize("hasRole('ROLE_READER')")
     public PublishingHouseDto getPublishingHouse(@PathVariable("id") Long id) {
         return publishingHouseService.getPublishingHouse(id);
     }
 
     @GetMapping("/publishingHouses")
+    @PreAuthorize("hasRole('ROLE_READER')")
     public List<PublishingHouseDto> getPageablePublishingHouses(@RequestParam(name = "page", defaultValue = "0") int page,
                                                       @RequestParam(name = "size", defaultValue = "5") int size) {
         return publishingHouseService.getPageablePublishingHouses(page, size);
     }
 
     @DeleteMapping("/publishingHouse/{id}")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePublishingHouse(@PathVariable("id") Long id) {
         publishingHouseService.deletePublishingHouse(id);

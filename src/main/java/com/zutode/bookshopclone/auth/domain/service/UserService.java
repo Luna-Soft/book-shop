@@ -2,6 +2,7 @@ package com.zutode.bookshopclone.auth.domain.service;
 
 import com.zutode.bookshopclone.auth.domain.model.SignUpRequest;
 import com.zutode.bookshopclone.auth.domain.model.entity.UserAccount;
+import com.zutode.bookshopclone.auth.domain.model.entity.UserRoles;
 import com.zutode.bookshopclone.auth.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +30,15 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserAccount userAccount = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Cannot find username: " + username));
-        return new User(userAccount.getUsername(), userAccount.getPassword(), Collections.emptyList());
+        Set<UserRoles> userAuthority = Collections.singleton(userAccount.getUserRole());
+        return new User(userAccount.getUsername(), userAccount.getPassword(), userAuthority);
     }
 
     @Transactional
     public UserDetails addNewUser(SignUpRequest user){
         if(user.getPassword() != null && user.getPassword().equals(user.getConfirmPassword())){
             UserAccount userAccount = modelMapper.map(user, UserAccount.class);
+            userAccount.setUserRole(UserRoles.ROLE_READER);
             userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
             try{
                 UserAccount save = userRepository.save(userAccount);
