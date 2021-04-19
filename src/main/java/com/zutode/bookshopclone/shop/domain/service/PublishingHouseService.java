@@ -24,8 +24,8 @@ public class PublishingHouseService {
 
     @Transactional
     public PublishingHouseDto createPublishingHouse(PublishingHouseDto publishingHouseDto) {
-        checkIfPublishingHouseAlreadyExists(publishingHouseDto);
         PublishingHouse publishingHouse = modelMapper.map(publishingHouseDto, PublishingHouse.class);
+        checkIfPublishingHouseAlreadyExists(publishingHouse);
         PublishingHouse saved = publishingHouseRepository.save(publishingHouse);
         return modelMapper.map(saved,PublishingHouseDto.class);
     }
@@ -67,9 +67,9 @@ public class PublishingHouseService {
     }
 
 
-    private void checkIfPublishingHouseAlreadyExists(PublishingHouseDto publishingHouseDto) {
-        if(publishingHouseRepository.existsByName(publishingHouseDto.getName())) {
-            throw new ResourceAlreadyExistsException("Publishing house by name: " + publishingHouseDto.getName() + " already exists");
+    private void checkIfPublishingHouseAlreadyExists(PublishingHouse publishingHouse) {
+        if(publishingHouseRepository.existsByName(publishingHouse.getName())) {
+            throw new ResourceAlreadyExistsException("Publishing house by name: " + publishingHouse.getName() + " already exists");
         }
     }
 }

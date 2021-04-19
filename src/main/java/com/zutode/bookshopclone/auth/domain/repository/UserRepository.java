@@ -9,4 +9,5 @@ public interface UserRepository extends PagingAndSortingRepository<UserAccount, 
 
 
     Optional<UserAccount> findByUsername(String username);
+
 }

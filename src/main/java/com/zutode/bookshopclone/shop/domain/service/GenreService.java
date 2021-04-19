@@ -27,8 +27,8 @@ public class GenreService {
 
     @Transactional
     public GenreDto createGenre(GenreDto genreDto) {
-        checkIfGenreAlreadyExists(genreDto);
         Genre genre = modelMapper.map(genreDto, Genre.class);
+        checkIfGenreAlreadyExists(genre);
         Genre saved = genreRepository.save(genre);
         return modelMapper.map(saved, GenreDto.class);
 
@@ -86,9 +86,9 @@ public class GenreService {
     }
 
 
-    private void checkIfGenreAlreadyExists(GenreDto genreDto) {
-        if (genreRepository.existsByName(genreDto.getName())) {
-            throw new ResourceAlreadyExistsException("Genre: " + genreDto.getName() + " already exists");
+    private void checkIfGenreAlreadyExists(Genre genre) {
+        if (genreRepository.existsByName(genre.getName())) {
+            throw new ResourceAlreadyExistsException("Genre: " + genre.getName() + " already exists");
         }
     }
 
