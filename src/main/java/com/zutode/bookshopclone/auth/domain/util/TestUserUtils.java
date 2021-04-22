@@ -22,8 +22,8 @@ public class TestUserUtils {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         List<UserAccount> userAccounts = Stream.of(
                 new UserAccount(101L, "zutode", bCryptPasswordEncoder.encode("password"), "zutode@wp.pl", UserRoles.ROLE_MAINTAINER),
-                new UserAccount(102L, "user1", bCryptPasswordEncoder.encode("pwd1"), "user1@wp.pl", UserRoles.ROLE_READER),
-                new UserAccount(103L, "user2", bCryptPasswordEncoder.encode("pwd2"), "user2@wp.pl", UserRoles.ROLE_READER),
+                new UserAccount(102L, "user1", bCryptPasswordEncoder.encode("pwd1"), "user1@wp.pl", UserRoles.ROLE_MAINTAINER),
+                new UserAccount(103L, "user2", bCryptPasswordEncoder.encode("pwd2"), "user2@wp.pl", UserRoles.ROLE_MAINTAINER),
                 new UserAccount(104L, "user3", bCryptPasswordEncoder.encode("pwd3"), "user3@wp.pl", UserRoles.ROLE_READER)
         ).collect(Collectors.toList());
 

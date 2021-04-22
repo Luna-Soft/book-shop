@@ -49,7 +49,11 @@ public class AuthorServiceTest {
         String surname = "surname";
         authorDto.setName(name);
         authorDto.setSurname(surname);
+        Author author = new Author();
+        author.setName(name);
+        author.setSurname(surname);
         when(authorRepository.existsByNameAndSurname(name, surname)).thenReturn(true);
+        when(modelMapper.map(authorDto, Author.class)).thenReturn(author);
 
         //when
         ResourceAlreadyExistsException exception = assertThrows(ResourceAlreadyExistsException.class,

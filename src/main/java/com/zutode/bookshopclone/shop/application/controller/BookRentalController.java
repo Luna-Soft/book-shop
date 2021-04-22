@@ -60,13 +60,13 @@ public class BookRentalController {
     }
 
     @GetMapping("/booksRental/{id}")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public BookRentalReadDto getBookRental(@PathVariable("id") Long id) {
         return bookRentalService.getBookRental(id);
     }
 
     @GetMapping("/booksRentals")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public List<BookRentalReadDto> getPageableBooksRentals(@RequestParam(name = "page", defaultValue = "0") int page,
                                                            @RequestParam(name = "size", defaultValue = "5") int size,
                                                            Authentication authentication) {

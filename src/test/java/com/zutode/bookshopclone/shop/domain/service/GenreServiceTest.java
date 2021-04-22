@@ -47,7 +47,10 @@ public class GenreServiceTest {
         GenreDto genreDto = new GenreDto();
         String name = "name";
         genreDto.setName(name);
+        Genre genre = new Genre();
+        genre.setName(name);
         when(genreRepository.existsByName(name)).thenReturn(true);
+        when(modelMapper.map(genreDto, Genre.class)).thenReturn(genre);
 
         //when
         ResourceAlreadyExistsException exception = assertThrows(ResourceAlreadyExistsException.class,

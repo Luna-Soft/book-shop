@@ -35,14 +35,14 @@ public class AuthorController {
     }
 
     @GetMapping("/author/{id}")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public AuthorDto getAuthor(@PathVariable("id") Long id) {
         return authorService.getAuthor(id);
     }
 
 
     @GetMapping("/authors")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public List<AuthorDto> getPageableAuthors(@RequestParam(name = "page", defaultValue = "0") int page,
                                               @RequestParam(name = "size", defaultValue = "5") int size) {
         return authorService.getPageableAuthors(page, size);
@@ -50,7 +50,7 @@ public class AuthorController {
     }
 
     @PutMapping("/author/{id}")
-    @PreAuthorize("hasRole('ROLE_MAINTAINER')")
+    @PreAuthorize("hasRole('ROLE_MAINTAINER') or hasRole('ROLE_MAINTAINER')")
     public AuthorDto updateAuthor(@Validated @RequestBody AuthorDto authorDto,
                                   @PathVariable("id") Long id,
                                   BindingResult bindingResult) {

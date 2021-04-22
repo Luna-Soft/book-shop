@@ -46,7 +46,9 @@ public class PublishingHouseServiceTest {
         //given
         PublishingHouseDto publishingHouseDto = new PublishingHouseDto();
         String name = "name";
-        publishingHouseDto.setName(name);
+        PublishingHouse publishingHouse = new PublishingHouse();
+        publishingHouse.setName(name);
+        when(modelMapper.map(publishingHouseDto, PublishingHouse.class)).thenReturn(publishingHouse);
         when(publishingHouseRepository.existsByName(name)).thenReturn(true);
 
         //when

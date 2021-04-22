@@ -1,8 +1,6 @@
-/*
+
 package com.zutode.bookshopclone.shop.domain.service;
 
-import com.zutode.bookshopclone.auth.domain.model.entity.UserAccount;
-import com.zutode.bookshopclone.auth.domain.service.UserService;
 import com.zutode.bookshopclone.shop.application.dto.BookRentalReadDto;
 import com.zutode.bookshopclone.shop.application.dto.BookRentalWriteDto;
 import com.zutode.bookshopclone.shop.application.exception.ResourceAlreadyExistsException;
@@ -10,7 +8,6 @@ import com.zutode.bookshopclone.shop.domain.model.TimeProvider;
 import com.zutode.bookshopclone.shop.domain.model.entity.Book;
 import com.zutode.bookshopclone.shop.domain.model.entity.BookRental;
 import com.zutode.bookshopclone.shop.domain.repository.BookRentalRepository;
-import com.zutode.bookshopclone.shop.domain.repository.BookRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -36,11 +33,7 @@ public class BookRentalServiceTest {
     @Mock
     private BookService bookService;
     @Mock
-    private UserService userService;
-    @Mock
     private TimeProvider timeProvider;
-    @Mock
-    private BookRepository bookRepository;
 
 
     private BookRentalService bookRentalService;
@@ -48,8 +41,8 @@ public class BookRentalServiceTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.initMocks(this);
-        bookRentalService = new BookRentalService(bookRentalRepository, bookService, userService, modelMapper,
-                10, new BigDecimal("0.4"), timeProvider);
+        bookRentalService = new BookRentalService(bookRentalRepository, modelMapper,
+                10, new BigDecimal("0.4"), timeProvider, bookService);
     }
 
 
@@ -57,21 +50,16 @@ public class BookRentalServiceTest {
     void shouldThrowExceptionWhenBookRentalAlreadyExists() {
         //given
         Long bookId = 123L;
-        Long userId = 456L;
 
         BookRentalWriteDto bookRentalWriteDto = new BookRentalWriteDto();
         BookRental bookRental = Mockito.spy(BookRental.class);
         Book book = new Book();
-        UserAccount userAccount = new UserAccount();
-
         LocalDate initialDate = LocalDate.of(2021, 4, 9);
-        bookRentalWriteDto.setBookId(bookId);
-        bookRentalWriteDto.setUserId(userId);
         book.setId(bookId);
+        bookRental.setBook(book);
 
         when(modelMapper.map(bookRentalWriteDto, BookRental.class)).thenReturn(bookRental);
         when(bookService.findBookById(bookId)).thenReturn(book);
-        when(userService.findUserById(userId)).thenReturn(userAccount);
         when(timeProvider.now()).thenReturn(initialDate);
         when(bookRentalRepository.existsByBookIdAndReturnDateIsNull(bookId)).thenReturn(true);
 
@@ -83,7 +71,6 @@ public class BookRentalServiceTest {
 
         //then
         verify(bookRental).setBook(book);
-        verify(bookRental).setUser(userAccount);
         verify(bookRental).setInitialDate(initialDate);
         verify(bookRental).setExpectedReturnDate(initialDate.plusDays(10));
         assertThat(exception.getMessage()).isEqualTo("Book with id " + bookId + " is already rent!");
@@ -94,22 +81,17 @@ public class BookRentalServiceTest {
     void shouldSaveCreatedRentalBook() {
         //given
         Long bookId = 123L;
-        Long userId = 456L;
 
         BookRentalWriteDto bookRentalWriteDto = new BookRentalWriteDto();
         BookRentalReadDto bookRentalReadDto = new BookRentalReadDto();
         BookRental bookRental = Mockito.spy(BookRental.class);
         LocalDate initialDate = LocalDate.of(2021, 4, 9);
         Book book = new Book();
-        UserAccount userAccount = new UserAccount();
-
-        bookRentalWriteDto.setBookId(bookId);
-        bookRentalWriteDto.setUserId(userId);
+        bookRental.setBook(book);
         book.setId(bookId);
 
         when(modelMapper.map(bookRentalWriteDto, BookRental.class)).thenReturn(bookRental);
         when(bookService.findBookById(bookId)).thenReturn(book);
-        when(userService.findUserById(userId)).thenReturn(userAccount);
         when(bookRentalRepository.existsByBookIdAndReturnDateIsNull(bookId)).thenReturn(false);
         when(timeProvider.now()).thenReturn(initialDate);
         when(bookRentalRepository.save(bookRental)).thenReturn(bookRental);
@@ -120,7 +102,6 @@ public class BookRentalServiceTest {
 
         //then
         verify(bookRental).setBook(book);
-        verify(bookRental).setUser(userAccount);
         verify(bookRental).setInitialDate(initialDate);
         verify(bookRental).setExpectedReturnDate(initialDate.plusDays(10));
         assertThat(bookRentalReadDto).isEqualTo(returned);
@@ -128,4 +109,4 @@ public class BookRentalServiceTest {
 
 
 }
-*/
+

@@ -48,7 +48,7 @@ public class GenreController {
         return genreService.updateGenre(genreDto, id);
     }
 
-    @GetMapping("/genre/{id}")
+    @GetMapping("/genre/{id} or hasRole('ROLE_MAINTAINER')")
     @PreAuthorize("hasRole('ROLE_READER')")
     public GenreDto getGenre(@PathVariable Long id) {
         return genreService.getGenre(id);
@@ -56,7 +56,7 @@ public class GenreController {
 
 
     @GetMapping("/genres")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public List<GenreDto> getPageableGenres(@RequestParam(name = "page", defaultValue = "0") int page,
                                             @RequestParam(name = "size", defaultValue = "5") int size) {
         return genreService.getPageableGenres(page, size);
