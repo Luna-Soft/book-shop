@@ -46,13 +46,13 @@ public class PublishingHouseController {
 
 
     @GetMapping("/publishingHouse/{id}")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public PublishingHouseDto getPublishingHouse(@PathVariable("id") Long id) {
         return publishingHouseService.getPublishingHouse(id);
     }
 
     @GetMapping("/publishingHouses")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public List<PublishingHouseDto> getPageablePublishingHouses(@RequestParam(name = "page", defaultValue = "0") int page,
                                                       @RequestParam(name = "size", defaultValue = "5") int size) {
         return publishingHouseService.getPageablePublishingHouses(page, size);

@@ -46,14 +46,14 @@ public class BookController {
     }
 
     @GetMapping("/book/{id}")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public BookReadDto getBook(@PathVariable("id") Long id) {
         return bookService.getBook(id);
     }
 
 
     @GetMapping("/books")
-    @PreAuthorize("hasRole('ROLE_READER')")
+    @PreAuthorize("hasRole('ROLE_READER') or hasRole('ROLE_MAINTAINER')")
     public List<BookReadDto> getPageableBooks(@RequestParam(name = "page", defaultValue = "0") int page,
                                               @RequestParam(name = "size", defaultValue = "5") int size) {
         return bookService.getPageableBooks(page, size);

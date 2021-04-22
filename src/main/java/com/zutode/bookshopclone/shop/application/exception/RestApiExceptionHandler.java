@@ -3,6 +3,7 @@ package com.zutode.bookshopclone.shop.application.exception;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,6 +80,11 @@ public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handle(AccessDeniedException ex, WebRequest request) {
         return createResponseEntity(ex, request, HttpStatus.FORBIDDEN);
     }
+
+   /* @ExceptionHandler(value = InvalidDataAccessApiUsageException.class)
+    protected ResponseEntity<Object> handle(InvalidDataAccessApiUsageException ex, WebRequest request) {
+        return createResponseEntity(ex, request, HttpStatus.FORBIDDEN);
+    }*/
 
 
     private ResponseEntity<Object> createResponseEntity(RuntimeException ex, WebRequest request, HttpStatus status) {
